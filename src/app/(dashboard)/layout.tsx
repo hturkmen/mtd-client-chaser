@@ -34,11 +34,34 @@ export default function DashboardLayout({
 
       // Fetch firm data
       try {
-        const { data: firmUser } = await supabase
+        let { data: firmUser } = await supabase
           .from("firm_users")
           .select("firm_id, role")
           .eq("user_id", user.id)
           .maybeSingle();
+
+        // If no firm exists (e.g. Google OAuth user), create one
+        if (!firmUser) {
+          const displayName =
+            user.user_metadata?.firm_name ||
+            user.user_metadata?.full_name ||
+            user.email?.split("@")[0] + "'s Firm";
+
+          const { data: newFirm } = await supabase
+            .from("firms")
+            .insert({ name: displayName, email: user.email! })
+            .select()
+            .single();
+
+          if (newFirm) {
+            await supabase.from("firm_users").insert({
+              firm_id: newFirm.id,
+              user_id: user.id,
+              role: "owner",
+            });
+            firmUser = { firm_id: newFirm.id, role: "owner" };
+          }
+        }
 
         if (firmUser) {
           const { data: firm } = await supabase

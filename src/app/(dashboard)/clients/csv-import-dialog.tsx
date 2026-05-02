@@ -137,7 +137,7 @@ export function CsvImportDialog({
       .from("firm_users")
       .select("firm_id")
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (!firmUser) return;
 

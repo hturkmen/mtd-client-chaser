@@ -67,7 +67,7 @@ Thanks,
         .from("firm_users")
         .select("firm_id, role, firms(*)")
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
 
       if (firmUser?.firms) {
         const f = firmUser.firms as any;

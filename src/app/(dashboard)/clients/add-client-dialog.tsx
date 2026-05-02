@@ -61,9 +61,13 @@ export function AddClientDialog({
       .from("firm_users")
       .select("firm_id")
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
-    if (!firmUser) return;
+    if (!firmUser) {
+      toast.error("Could not find your firm. Please try logging in again.");
+      setLoading(false);
+      return;
+    }
 
     const { error } = await supabase.from("clients").insert({
       firm_id: firmUser.firm_id,
