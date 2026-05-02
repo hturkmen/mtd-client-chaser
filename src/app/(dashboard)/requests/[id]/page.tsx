@@ -94,27 +94,30 @@ export default function RequestDetailPage() {
 
   const handleSendReminder = async () => {
     if (!request) return;
-    // In production, this would call an API route that sends via Resend
-    toast.success("Reminder sent to " + request.clients?.email);
+    if (!request.clients?.email) {
+      toast.error("Client has no email address");
+      return;
+    }
 
-    // Log the reminder
-    await supabase.from("reminder_logs").insert({
-      request_id: request.id,
-      client_id: request.client_id,
-      channel: "email",
-      status: "sent",
-      message_preview: `Reminder for ${request.title}`,
-    });
+    try {
+      const res = await fetch("/api/reminders/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ requestId: request.id }),
+      });
 
-    await supabase
-      .from("document_requests")
-      .update({
-        reminder_count: (request.reminder_count || 0) + 1,
-        last_reminder_at: new Date().toISOString(),
-      })
-      .eq("id", request.id);
+      const data = await res.json();
 
-    fetchData();
+      if (!res.ok) {
+        toast.error(data.error || "Failed to send reminder");
+        return;
+      }
+
+      toast.success("Reminder sent to " + request.clients.email);
+      fetchData();
+    } catch {
+      toast.error("Failed to send reminder");
+    }
   };
 
   const statusColors: Record<string, string> = {
