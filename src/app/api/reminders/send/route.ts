@@ -22,11 +22,22 @@ export async function POST(request: Request) {
     );
   }
 
-  // Fetch request with client and firm info
+  // Fetch request with client and firm info — verify ownership
+  const { data: firmUser } = await supabase
+    .from("firm_users")
+    .select("firm_id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (!firmUser) {
+    return NextResponse.json({ error: "No firm found" }, { status: 403 });
+  }
+
   const { data: docRequest, error: reqError } = await supabase
     .from("document_requests")
     .select("*, clients(id, name, email, phone), firms(id, name, email)")
     .eq("id", requestId)
+    .eq("firm_id", firmUser.firm_id)
     .single();
 
   if (reqError || !docRequest) {

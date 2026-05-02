@@ -66,6 +66,24 @@ export default function UploadPage() {
     fetchData();
   }, [token, supabase]);
 
+  const ALLOWED_TYPES = [
+    "application/pdf",
+    "image/jpeg",
+    "image/png",
+    "image/gif",
+    "image/webp",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/vnd.ms-excel",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "text/csv",
+    "text/plain",
+  ];
+
+  const sanitizeFileName = (name: string) => {
+    return name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 200);
+  };
+
   const handleFileUpload = async (
     itemId: string,
     file: File
@@ -75,10 +93,15 @@ export default function UploadPage() {
       alert("File size must be less than 50MB");
       return;
     }
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      alert("File type not allowed. Please upload PDF, images, Word, Excel, or CSV files.");
+      return;
+    }
 
     setUploading(itemId);
 
-    const filePath = `uploads/${request.firm_id}/${request.id}/${itemId}/${file.name}`;
+    const safeName = sanitizeFileName(file.name);
+    const filePath = `uploads/${request.firm_id}/${request.id}/${itemId}/${safeName}`;
 
     // Upload to Supabase Storage
     const { data: uploadData, error: uploadError } = await supabase.storage
