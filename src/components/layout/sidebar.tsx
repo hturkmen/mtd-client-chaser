@@ -63,7 +63,7 @@ export function Sidebar() {
     : navItems;
 
   return (
-    <aside className="fixed left-0 top-0 z-40 h-screen w-64 bg-[oklch(0.22_0.08_260)] text-white flex flex-col">
+    <aside className="fixed left-0 top-0 z-40 h-screen w-64 bg-slate-900 text-white flex flex-col">
       {/* Logo */}
       <div className="flex items-center gap-2 px-6 py-5">
         <FileCheck className="h-7 w-7 text-blue-300" />
