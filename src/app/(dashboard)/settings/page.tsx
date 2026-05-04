@@ -16,6 +16,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Save, Upload } from "lucide-react";
 import { toast } from "sonner";
+import { TeamManagement } from "./team-management";
 
 export default function SettingsPage() {
   const supabase = createClient();
@@ -299,20 +300,7 @@ Thanks,
         </TabsContent>
 
         <TabsContent value="team" className="mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Team Members</CardTitle>
-              <CardDescription>
-                Manage who has access to your firm account
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground text-center py-8">
-                Team management coming soon. Currently only the account owner
-                has access.
-              </p>
-            </CardContent>
-          </Card>
+          <TeamManagement firmId={firm?.id} />
         </TabsContent>
       </Tabs>
     </div>
